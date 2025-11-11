@@ -6,6 +6,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.programacion3.Sys_pos.dto.api_response.ApiResponse;
 import com.programacion3.Sys_pos.dto.api_response.CreateRolDto;
+import com.programacion3.Sys_pos.dto.api_response.RoleApiResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -30,29 +31,27 @@ public class RolService {
     public ApiResponse crearRol(CreateRolDto createRolDto) {
         try {
             String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
-                    .path("/roles") // Ajusta este endpoint según tu API Nest
+                    .path("/rol")
                     .toUriString();
 
-            // Configurar headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
 
-            // Crear la entidad HTTP con el DTO y headers
             HttpEntity<CreateRolDto> requestEntity = new HttpEntity<>(createRolDto, headers);
 
             log.info("Enviando solicitud para crear rol: {}", createRolDto.getRol());
 
-            // Realizar la petición POST
-            ResponseEntity<ApiResponse> response = restTemplate.exchange(
+            // Usar NestApiResponse para la respuesta
+            ResponseEntity<RoleApiResponse> response = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
                     requestEntity,
-                    ApiResponse.class);
+                    RoleApiResponse.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 log.info("Rol creado exitosamente: {}", response.getBody().getMessage());
-                return response.getBody();
+                return response.getBody().toGenericResponse();
             } else {
                 log.error("Error en la respuesta de la API: {}", response.getStatusCode());
                 return crearRespuestaError("Error al crear el rol: " + response.getStatusCode());
@@ -70,17 +69,19 @@ public class RolService {
     public ApiResponse obtenerTodosLosRoles() {
         try {
             String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
-                    .path("/roles")
+                    .path("/rol")
                     .toUriString();
 
-            ResponseEntity<ApiResponse> response = restTemplate.exchange(
+            // Cambiar a NestApiResponse
+            ResponseEntity<RoleApiResponse> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     null,
-                    ApiResponse.class);
+                    RoleApiResponse.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                return response.getBody();
+                // Convertir la respuesta específica a genérica
+                return response.getBody().toGenericResponse();
             } else {
                 return crearRespuestaError("Error al obtener roles: " + response.getStatusCode());
             }
@@ -97,17 +98,17 @@ public class RolService {
     public ApiResponse obtenerRolPorId(Long id) {
         try {
             String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
-                    .path("/roles/" + id)
+                    .path("/rol/" + id)
                     .toUriString();
 
-            ResponseEntity<ApiResponse> response = restTemplate.exchange(
+            ResponseEntity<RoleApiResponse> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     null,
-                    ApiResponse.class);
+                    RoleApiResponse.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                return response.getBody();
+                return response.getBody().toGenericResponse();
             } else {
                 return crearRespuestaError("Error al obtener el rol: " + response.getStatusCode());
             }

@@ -7,4 +7,5 @@ import lombok.Data;
 public class roleDto {
     private Long id;
     private String rol;
+    private Boolean isActivated;
 }
